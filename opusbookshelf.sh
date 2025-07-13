@@ -41,8 +41,8 @@ export DO_CMD="do_list"
 
 # compress audio normalize the volume so all tracks are similar loudness
 export COMPRESSOR=" -filter_complex compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5 "
-# 16k 48k mono opus file, bump it to 32k for double the space slightly higher quality etc
-export OPUSQUALITY=" -ac 1 -c:a libopus -b:a 16k "
+# 16k mono opus file, bump it to 32k for double the space slightly higher quality etc
+export OPUSQUALITY=" -ac 1 -ar 48000 -c:a libopus -b:a 16k "
 
 
 echo " process data "
@@ -84,7 +84,6 @@ AUDIBLE=" -audible_key $AUDIBLE_KEY -audible_iv $AUDIBLE_IV "
 fi
 
 mkdir -p "$ODIR"
-echo "$1" ">>into>>" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
 ffmpeg -y $AUDIBLE -i "$1" $COMPRESSOR $OPUSQUALITY "./audiobook.opus" && mv "./audiobook.opus" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
