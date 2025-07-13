@@ -61,7 +61,7 @@ echo "$ODIR"
 mkdir -p "$ODIR"
 echo "$1" ">>into>>" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
-ffmpeg-bar -i "$1" -filter_complex "compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5" -ac 1 -c:a libopus -b:a 24k "./audiobook.opus"
+ffmpeg-bar -i "$1" -filter_complex "compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5" -ac 1 -c:a libopus -b:a 16k "./audiobook.opus"
 mv "./audiobook.opus" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
 
