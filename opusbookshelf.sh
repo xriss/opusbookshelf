@@ -15,6 +15,7 @@ fi
 #install dependencies using require.sh
 
 #require.sh parallel
+require.sh jq
 require.sh ffmpeg
 require.sh exiftool
 
@@ -24,15 +25,27 @@ require.sh exiftool
 #	sudo npm install --global ffmpeg-progressbar-cli
 #fi
 
+# audible download into current dir
+# uvx --from audible-cli audible download --all --aaxc -j 1 --ignore-errors -q high
+
 
 echo " Parsing configuration and commands "
 
-export DIR_AUDIO="/data/audiobooks"
+#export DIR_AUDIO="/data/audible"
+#export DIR_OPUS="./opusbooks"
+
+export DIR_AUDIO="/data/audible"
 export DIR_OPUS="/data/opusbooks"
 export DO_CMD="do_list"
 
 
-echo " Now it is time to process data "
+# compress audio normalize the volume so all tracks are similar loudness
+export COMPRESSOR=" -filter_complex compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5 "
+# 16k 48k mono opus file, bump it to 32k for double the space slightly higher quality etc
+export OPUSQUALITY=" -ac 1 -c:a libopus -b:a 16k "
+
+
+echo " process data "
 
 
 do_files() {
@@ -47,25 +60,40 @@ while IFS=': ' read -r key value; do
 	EXIF["$key"]="$value"
 done < <(exiftool -s "$1")
     
-if [[ ${EXIF["MIMEType"]} == audio/* ]] && [[ -n ${EXIF["Artist"]} ]] && [[ -n ${EXIF["Album"]} ]] ; then
+if [[ ${EXIF["MIMEType"]} =~ (audio|video)/.* ]] && [[ -n ${EXIF["Artist"]} ]] && [[ -n ${EXIF["Album"]} ]] ; then
 
 #echo $ENAM -- $DNAM -- $FNAM
 #echo ${EXIF["Artist"]} / ${EXIF["Album"]} / $FNAM
 
 ODIR="$DIR_OPUS/${EXIF["Artist"]}/${EXIF["Album"]}"
 
-# only if opus does not exist
+echo "IN	$1"
+echo "OUT	$ODIR/$BNAM.opus"
+
+# only process if opus does not exist
 if [ ! -f "$ODIR/$BNAM.opus" ]; then
 
-echo "$ODIR"
+AUDIBLE=""
+
+if [ -f "$DNAM/$BNAM.voucher" ]; then # audible-cli keys
+
+AUDIBLE_KEY=` jq -r ".content_license.license_response.key" "$DNAM/$BNAM.voucher" `
+AUDIBLE_IV=`  jq -r ".content_license.license_response.iv"  "$DNAM/$BNAM.voucher" `
+AUDIBLE=" -audible_key $AUDIBLE_KEY -audible_iv $AUDIBLE_IV "
+
+fi
+
 mkdir -p "$ODIR"
 echo "$1" ">>into>>" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
-ffmpeg -i "$1" -filter_complex "compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5" -ac 1 -c:a libopus -b:a 16k "./audiobook.opus"
-mv "./audiobook.opus" "$ODIR/$BNAM.opus"
+ffmpeg -y $AUDIBLE -i "$1" $COMPRESSOR $OPUSQUALITY "./audiobook.opus" && mv "./audiobook.opus" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
 
 fi
+
+else
+
+echo "IGNORE $1"
 
 fi
 
