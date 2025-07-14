@@ -39,8 +39,9 @@ export DIR_OPUS="/data/opusbooks"
 export DO_CMD="do_list"
 
 
-# compress audio normalize the volume so all tracks are similar loudness
-export COMPRESSOR=" -filter_complex compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5 "
+# compress audio normalize the volume so all tracks are similar loudness?
+#export COMPRESSOR=" -filter_complex compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5 "
+export COMPRESSOR=" "
 # 16k quality mono 48000 opus file, bump it to 32k for double the space slightly higher quality etc
 export OPUSQUALITY=" -ac 1 -ar 48000 -c:a libopus -b:a 16k "
 
