@@ -77,7 +77,7 @@ fi
 #echo ${EXIF["Artist"]} / ${EXIF["Album"]} / $FNAM
 
 OLDK=`du -k "$1" | cut -f1`
-OLDT=`ffprobe -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$1"`
+OLDT=`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$1" 2>/dev/null`
 
 ODIR="$DIR_OPUS/${EXIF["Artist"]}/${EXIF["Album"]}"
 
