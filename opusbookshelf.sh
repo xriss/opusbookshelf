@@ -31,7 +31,7 @@ require.sh exiftool
 
 echo " Parsing configuration and commands "
 
-#export DIR_AUDIO="/data/audible"
+#export DIR_AUDIO="/data/audiobooks"
 #export DIR_OPUS="./opusbooks"
 
 export DIR_AUDIO="/data/audible"
@@ -66,10 +66,10 @@ if [[ ${EXIF["MIMEType"]} =~ (audio|video)/.* ]] && [[ -n ${EXIF["Artist"]} ]] &
 #echo $ENAM -- $DNAM -- $FNAM
 #echo ${EXIF["Artist"]} / ${EXIF["Album"]} / $FNAM
 
-ODIR="$DIR_OPUS/${EXIF["Artist"]}/${EXIF["Album"]}"
+OLDK=`du -k "$1" | cut -f1`
+OLDT=`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$1"`
 
-echo "IN	$1"
-echo "OUT	$ODIR/$BNAM.opus"
+ODIR="$DIR_OPUS/${EXIF["Artist"]}/${EXIF["Album"]}"
 
 # only process if opus does not exist
 if [ ! -f "$ODIR/$BNAM.opus" ]; then
@@ -84,10 +84,25 @@ AUDIBLE=" -audible_key $AUDIBLE_KEY -audible_iv $AUDIBLE_IV "
 
 fi
 
+echo "IN	${OLDK}KiB ${OLDT} $1"
+echo "OUT	...KiB $ODIR/$BNAM.opus"
+
 mkdir -p "$ODIR"
 rm -f "./audiobook.opus"
 ffmpeg -y -loglevel warning -stats $AUDIBLE -i "$1" $COMPRESSOR $OPUSQUALITY "./audiobook.opus" && mv "./audiobook.opus" "$ODIR/$BNAM.opus"
 rm -f "./audiobook.opus"
+
+NEWK=`du -k "$ODIR/$BNAM.opus" | cut -f1`
+
+echo "shrunk	${OLDK}KiB to ${NEWK}KiB "
+
+else
+
+NEWK=`du -k "$ODIR/$BNAM.opus" | cut -f1`
+NEWT=`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$ODIR/$BNAM.opus"`
+
+echo "IN	${OLDK}KiB ${OLDT} $1"
+echo "OUT	${NEWK}KiB ${NEWT} $ODIR/$BNAM.opus"
 
 fi
 
