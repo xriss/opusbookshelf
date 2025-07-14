@@ -63,17 +63,6 @@ done < <(exiftool -s "$1")
     
 if [[ ${EXIF["MIMEType"]} =~ (audio|video)/.* ]] && [[ -n ${EXIF["Artist"]} ]] && [[ -n ${EXIF["Album"]} ]] ; then
 
-#echo $ENAM -- $DNAM -- $FNAM
-#echo ${EXIF["Artist"]} / ${EXIF["Album"]} / $FNAM
-
-OLDK=`du -k "$1" | cut -f1`
-OLDT=`ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$1"`
-
-ODIR="$DIR_OPUS/${EXIF["Artist"]}/${EXIF["Album"]}"
-
-# only process if opus does not exist
-if [ ! -f "$ODIR/$BNAM.opus" ]; then
-
 AUDIBLE=""
 
 if [ -f "$DNAM/$BNAM.voucher" ]; then # audible-cli keys
@@ -83,6 +72,18 @@ AUDIBLE_IV=`  jq -r ".content_license.license_response.iv"  "$DNAM/$BNAM.voucher
 AUDIBLE=" -audible_key $AUDIBLE_KEY -audible_iv $AUDIBLE_IV "
 
 fi
+
+#echo $ENAM -- $DNAM -- $FNAM
+#echo ${EXIF["Artist"]} / ${EXIF["Album"]} / $FNAM
+
+OLDK=`du -k "$1" | cut -f1`
+OLDT=`ffprobe -y $AUDIBLE -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 -sexagesimal "$1"`
+
+ODIR="$DIR_OPUS/${EXIF["Artist"]}/${EXIF["Album"]}"
+
+# only process if opus does not exist
+if [ ! -f "$ODIR/$BNAM.opus" ]; then
+
 
 echo "IN	${OLDK}KiB ${OLDT} $1"
 echo "OUT	...KiB $ODIR/$BNAM.opus"
