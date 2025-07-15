@@ -12,7 +12,13 @@ Clone this repo and cd into it
 	git clone https://github.com/xriss/opusbookshelf.git
 	cd opusbookshelf
 
-Create a local configuration file
+Create a local configuration file, the script will first attempt to 
+install any missing dependencies required by the script using 
+https://github.com/xriss/require.sh which should work on most flavors 
+of debian, fedora, arch etc etc but will ask for sudo access. If you do 
+not trust that then install all the dependencies yourself and make sure 
+they are available from the path *including* a dummy require.sh that 
+does nothing.
 
 	./opusbookshelf.sh save
 	
@@ -47,3 +53,8 @@ tags.
 Check the file with exiftool and make sure it has an Artist and an 
 Album tag set as we use/require these to build the output directory 
 structure that audiobookshelf expects. No tags, no output.
+
+This all worked for me, maybe it can for you too, at the very least you 
+will find example invocations of ffmpeg in the bash source to perform 
+conversions from aaxc files produced by audible-cli.
+
