@@ -1,13 +1,19 @@
 # opusbookshelf
-Bash script to batch convert audio book files to opus.
+
+Simpleish bash script to download and batch convert audio book files 
+from audible into opus for use as an audiobookshelf library.
 
 
-The following steps will let you opus your audible into somethng that 
-audiobookshelf will accept as a library.
+The following steps will let you opus your audible library into 
+something that audiobookshelf will accept.
 
-Clone this repo
+Clone this repo and cd into it
+
+	git clone https://github.com/xriss/opusbookshelf.git
+	cd opusbookshelf
 
 Create a local configuration file
+
 	./opusbookshelf.sh save
 	
 Edit the config file as you see fit, if you do not change anything we 
@@ -36,8 +42,8 @@ Convert audible files to opus
 This should just work with any audio files that have reasonable tags, 
 so the input files could be sourced from anywhere not just audible. If 
 it does not try to convert an audio file then it is probably missing 
-tags or the opus file already exists.
+tags.
 
-Generally Check the file with exiftool and make sure it has an Artist 
-and an Album tag set as we use/require these to build the output 
-directory structure that audiobookshelf expects.
+Check the file with exiftool and make sure it has an Artist and an 
+Album tag set as we use/require these to build the output directory 
+structure that audiobookshelf expects. No tags, no output.
