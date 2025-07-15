@@ -14,6 +14,7 @@ Edit the config file as you see fit, if you do not change anything we
 will download and convert into sub directories.
 
 Login to audible
+
 	./opusbookshelf.sh save
 
 You must answer all the riddle correctly to get past this step, we are 
@@ -22,12 +23,14 @@ audible" so you can try rawdoging that instead. For me the "login with
 external browser?" worked, so I recomend saying yes to that.
 
 Download from audible
+
 	./opusbookshelf.sh audible
 	
 This will of course take some time and you might want to rawdog 
 audible-cli instead.
 
 Convert audible files to opus
+
 	./opusbookshelf.sh opus
 
 This should just work with any audio files that have reasonable tags, 
