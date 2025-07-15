@@ -148,11 +148,18 @@ if [[ $DO_CMD =~ (list|opus) ]] ; then
 	exit 0
 fi
 
+if [[ $DO_CMD =~ login ]] ; then
+
+	echo " logging into audible using audible-cli "
+
+	uvx --from audible-cli audible quickstart
+
+	exit 0
+fi
+
 if [[ $DO_CMD =~ audible ]] ; then
 
-	echo " for this to work you must first setup audible authorization with "
-	echo " uvx --from audible-cli audible quickstart "
-	echo " downloading all audible files into $DIR_AUDIO/  "
+	echo " downloading all audible files into $DIR_AUDIO/ using audible-cli "
 
 	mkdir -p "$DIR_AUDIO/"
 	cd "$DIR_AUDIO/"
@@ -171,8 +178,8 @@ exists. to initalise this file use the save action
 
 	./opusbookshelf.sh save
 
-./opusbookshelf.sh.env.sh may now be edited to change the default input 
-and output paths etc. Current options are :
+./opusbookshelf.sh.env.sh may then be edited to change the default 
+input and output paths etc. Current options are :
 
 	DIR_AUDIO=./audiobooks
 		The directory to search for audio files in or to create and 
@@ -186,12 +193,13 @@ and output paths etc. Current options are :
 		32k if you feel this is not enough and you do not mind larger 
 		files.
 		
-	COMPRESSOR=" -filter_complex compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5 "
+	COMPRESSOR=" "
 		Setup a compressor or any ffmpeg filter, for use when 
 		converting to opus eg the following will dynamically adjust 
 		audio volume
+	COMPRESSOR=" -filter_complex compand=attacks=0:points=-80/-900|-45/-15|-27/-9|0/-7|20/-7:gain=5 "
 
-	OPUSQUALITY=" -ac 1 -ar 48000 -c:a libopus -b:a $OPUSK "
+	OPUSQUALITY=" -ac 1 -ar 48000 -c:a libopus -b:a \$OPUSK "
 		For more control over the opus output than just adjusting the 
 		quility, eg you want stereo or to adjust the 48k sample rate. 
 		This will overide the OPUSK setting if set.
@@ -218,8 +226,14 @@ to help.
 		information about how we would convert them. We use exiftool 
 		and ffprobe so this can take some time.
 
+	./opusbookshelf.sh login
+		Interctive login to audible usding audible-cli, must be run 
+		before you can download audible files.
+
 	./opusbookshelf.sh audible
-		Download all your books from audible using audible-cli.
+		Download all your books from audible using audible-cli, shold 
+		be save to stop and restart this process part way through unti 
+		it completes.
 
 	./opusbookshelf.sh opus
 		Convert all books found in DIR_AUDIO into opus files in 
